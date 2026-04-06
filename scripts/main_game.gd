@@ -4,6 +4,7 @@ extends Node2D
 @onready var keyboard = $CanvasLayer/PianoKeyboard
 @onready var spawner_timer = $SpawnerTimer
 @onready var score_label = $CanvasLayer/ScoreLabel
+@onready var maestro = $CanvasLayer/MaestroCharacter
 
 var active_balloons = []
 var current_song = [64, 62, 60, 62, 64, 64, 64, 62, 62, 62, 64, 67, 67] # Mary Had a Little Lamb
@@ -19,6 +20,7 @@ func _ready():
 	
 	GameManager.reset_game()
 	update_ui()
+	maestro.say("welcome")
 
 func _on_note_on(note: int):
 	keyboard.press_key(note)
