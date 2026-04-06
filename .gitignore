@@ -1,0 +1,13 @@
+# .gitignore for Godot 4
+.godot/
+*.translation
+*.tmp
+*.log
+*.import/
+*.mono/
+*.csproj
+*.sln
+*.obj
+bin/
+build/
+export_presets.cfg
