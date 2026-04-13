@@ -4,6 +4,14 @@ A piano learning game built with Godot 4. Pop balloons and fight monsters by pla
 
 ---
 
+## Screenshots
+
+| Start Screen | Gameplay |
+|---|---|
+| ![Start screen showing the top scores leaderboard and player setup](melody_maestro_startscreen.png) | ![Gameplay showing balloons, a monster, and the pause screen](melody_maestro.png) |
+
+---
+
 ## Features
 
 ### Input Methods
