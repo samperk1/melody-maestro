@@ -9,9 +9,13 @@ extends Node2D
 @onready var music_staff = $CanvasLayer/MusicStaff
 @onready var restart_button = $CanvasLayer/Controls/RestartButton
 @onready var exit_button = $CanvasLayer/Controls/ExitButton
+@onready var pause_button = $CanvasLayer/Controls/PauseButton
 @onready var level_clear_panel = $CanvasLayer/LevelClearPanel
 @onready var level_clear_label = $CanvasLayer/LevelClearPanel/VBoxContainer/LevelLabel
 @onready var continue_button = $CanvasLayer/LevelClearPanel/VBoxContainer/ContinueButton
+@onready var pause_panel = $CanvasLayer/PausePanel
+@onready var resume_button = $CanvasLayer/PausePanel/VBoxContainer/ResumeButton
+@onready var pause_quit_button = $CanvasLayer/PausePanel/VBoxContainer/QuitButton
 @onready var lives_label = $CanvasLayer/LivesLabel
 @onready var background = $Background
 
@@ -23,6 +27,7 @@ var streak = 0
 var is_celebrating: bool = false
 var strikes = 0
 var lives = 3
+var is_paused: bool = false
 
 var _bg_base_color: Color = Color(0.15, 0.2, 0.3)
 var _bg_time: float = 0.0
@@ -42,9 +47,13 @@ func _ready():
 	
 	restart_button.pressed.connect(_on_restart_pressed)
 	exit_button.pressed.connect(_on_exit_pressed)
+	pause_button.pressed.connect(_toggle_pause)
+	resume_button.pressed.connect(_toggle_pause)
+	pause_quit_button.pressed.connect(_on_exit_pressed)
 	continue_button.pressed.connect(_on_continue_pressed)
-	
+
 	level_clear_panel.visible = false
+	pause_panel.visible = false
 
 	# Add sky layer (clouds, birds, storm effects) behind everything
 	var sky = Node2D.new()
@@ -106,12 +115,23 @@ func _animate_background(delta: float):
 	)
 
 
+func _unhandled_input(event: InputEvent):
+	if event.is_action_pressed("ui_cancel"):
+		_toggle_pause()
+
+func _toggle_pause():
+	is_paused = !is_paused
+	get_tree().paused = is_paused
+	pause_panel.visible = is_paused
+	pause_button.text = "RESUME" if is_paused else "PAUSE"
+
 func _on_restart_pressed():
 	lives = 3
 	GameManager.save_game()
 	get_tree().reload_current_scene()
 
 func _on_exit_pressed():
+	get_tree().paused = false
 	GameManager.save_game()
 	get_tree().change_scene_to_file("res://scenes/welcome_screen.tscn")
 

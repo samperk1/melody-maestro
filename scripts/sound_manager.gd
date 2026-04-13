@@ -112,11 +112,12 @@ func _generate_bass_pulse():
 	bass_stream.format = AudioStreamWAV.FORMAT_16_BITS
 	bass_stream.mix_rate = sample_rate
 
-func play_note(midi_note: int):
+func play_note(midi_note: int, vol_db: float = 0.0):
 	var freq = 440.0 * pow(2.0, (midi_note - 69.0) / 12.0)
 	var player = _get_free_player()
 	player.stream = beep_stream
 	player.pitch_scale = freq / 440.0
+	player.volume_db = vol_db
 	player.play()
 
 func play_pop():

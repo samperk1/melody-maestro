@@ -42,11 +42,11 @@ func setup(note: int, start_pos: Vector2, _speed: float, _is_monster: bool = fal
 		_dark_col = _body_col.darkened(0.32)
 		_eye_col   = Color(1.0, 0.85, 0.0) if level < 12 else Color(1.0, 0.08, 0.08)
 
-		# Note label: white text, sits on the monster body
-		label.add_theme_color_override("font_color", Color.WHITE)
-		label.add_theme_font_size_override("font_size", 22)
+		# Note label: large yellow text with heavy black outline for high contrast
+		label.add_theme_color_override("font_color", Color(1.0, 1.0, 0.0))
+		label.add_theme_font_size_override("font_size", 30)
 		label.add_theme_color_override("font_outline_color", Color.BLACK)
-		label.add_theme_constants_override("outline_size", 6)
+		label.add_theme_constants_override("outline_size", 12)
 
 		# Bigger at higher levels
 		if level > 25:
@@ -148,6 +148,10 @@ func _draw():
 	# Feet (chunky blocks)
 	draw_rect(Rect2(-31, 22 + by + leg_l, 26, 9), _dark_col)
 	draw_rect(Rect2(6,   22 + by + leg_r, 26, 9), _dark_col)
+
+	# ── Note label backdrop (dark pill so text is always readable) ──────────
+	draw_rect(Rect2(-28, -14, 56, 26), Color(0.0, 0.0, 0.0, 0.70), true)
+	draw_rect(Rect2(-28, -14, 56, 26), Color(1.0, 1.0, 0.0, 0.35), false, 1.5)
 
 	# ── Eyes ────────────────────────────────────────────────────────────────
 	# Glow aura on high levels

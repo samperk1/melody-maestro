@@ -11,3 +11,4 @@
 bin/
 build/
 export_presets.cfg
+*.uid

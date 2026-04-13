@@ -5,8 +5,7 @@ var input_type: String = "MIDI Keyboard"
 var keys_count: int = 88
 var score: int = 0
 var current_level_index: int = 0
-var high_score: int = 0
-var high_score_player: String = "None"
+var leaderboard: Array = []  # [{name, score}, ...] top 3 sorted descending
 
 const SAVE_PATH = "user://save_game.dat"
 
@@ -223,14 +222,16 @@ func _generate_progressive_sequence(length: int, difficulty: int) -> Array:
 	return sequence
 
 func save_game():
-	if score > high_score:
-		high_score = score
-		high_score_player = player_name
+	# Add current run to leaderboard, keep top 3
+	if score > 0:
+		leaderboard.append({"name": player_name, "score": score})
+		leaderboard.sort_custom(func(a, b): return a.score > b.score)
+		if leaderboard.size() > 3:
+			leaderboard.resize(3)
 
 	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file:
-		var data = {"high_score": high_score, "high_score_player": high_score_player}
-		file.store_string(JSON.stringify(data))
+		file.store_string(JSON.stringify({"leaderboard": leaderboard}))
 		file.close()
 
 func load_game():
@@ -240,6 +241,12 @@ func load_game():
 			var content = file.get_as_text()
 			var data = JSON.parse_string(content)
 			if data:
-				high_score = data.get("high_score", 0)
-				high_score_player = data.get("high_score_player", "None")
+				if data.has("leaderboard"):
+					leaderboard = data.get("leaderboard", [])
+				elif data.has("high_score"):
+					# Migrate old single-entry format
+					var hs = data.get("high_score", 0)
+					var hp = data.get("high_score_player", "None")
+					if hs > 0:
+						leaderboard = [{"name": hp, "score": hs}]
 			file.close()

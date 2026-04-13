@@ -47,7 +47,7 @@ func _create_key(note: int) -> Control:
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.add_theme_font_size_override("font_size", 8 if is_black else 10)
+	label.add_theme_font_size_override("font_size", 11 if is_black else 14)
 	label.add_theme_color_override("font_color", Color.BLACK if not is_black else Color.WHITE)
 	container.add_child(label)
 
