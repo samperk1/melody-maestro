@@ -4,11 +4,13 @@ A piano learning game built with Godot 4.
 
 ## Features
 - **MIDI Input:** Support for external MIDI keyboards.
-- **Audio Input:** Acoustic piano detection using real-time pitch analysis (Beta).
+- **Computer Keyboard:** Play using your typing keyboard (Home row = white keys, QWERTY = black keys).
+- **Audio Input:** Fully implemented acoustic piano detection using real-time FFT pitch analysis.
 - **Multiple Keyboard Sizes:** 25, 49, 61, 88 keys support.
 - **Balloons Mode:** Pop balloons with the correct notes.
 - **Monster Mode:** Defend against zombies by playing notes.
 - **Dynamic Music:** Experience the "Groove" with backing tracks.
+- **Visual Improvements:** Enhanced monster note label readability with larger fonts and high-contrast outlines.
 
 ## How to Play
 1. Enter your name and select your input method.

@@ -1,7 +1,6 @@
 extends Control
 
 @onready var dialogue_label = $Panel/DialogueLabel
-@onready var animation_player = $AnimationPlayer
 
 var dialogues = {
 	"welcome": "Welcome, Maestro! I am your muse. Ready to play some piano?",
@@ -10,7 +9,18 @@ var dialogues = {
 	"groove_start": "I'm feeling the groove! Let's add some drums!",
 }
 
+var is_talking: bool = false
+
 func say(key: String):
-	if dialogues.has(key):
-		dialogue_label.text = dialogues[key]
-		# animation_player.play("talk")
+	if dialogues.has(key) and not is_talking:
+		dialogue_label.text = ""
+		var text = dialogues[key]
+		_type_out(text)
+
+func _type_out(text: String):
+	is_talking = true
+	for char in text:
+		dialogue_label.text += char
+		# Voice sound call removed based on user feedback
+		await get_tree().create_timer(0.05).timeout
+	is_talking = false
