@@ -10,7 +10,7 @@ The game is a single Godot 4 project using GDScript throughout. There are two au
 | `SoundManager` | Procedural audio engine — generates all sounds at runtime (no audio files needed) |
 | `InputHandler` | Routes MIDI events, keyboard presses, and microphone pitch data into unified `note_on` / `note_off` signals |
 
-Scene flow: `welcome_screen.tscn` → `main_game.tscn` (reloaded on restart or level clear).
+Scene flow: `main_game.tscn` is the permanent main scene — it never changes. The welcome screen loads as a `CanvasLayer` overlay (layer=100) on startup and is hidden (not freed) when the player starts a game, then re-shown on exit. This avoids Godot 4.6.2's AT-SPI idle-loop freeze that occurs whenever nodes exit the scene tree on Linux.
 
 ---
 
@@ -69,21 +69,63 @@ Scene flow: `welcome_screen.tscn` → `main_game.tscn` (reloaded on restart or l
 | Master | 26–30 | Game of Thrones, Beethoven's 5th, Flight of the Bumblebee |
 
 ### Distribution
-- `org.melodymaestro.Game.yaml` Flatpak manifest created; build with `flatpak-builder --force-clean build-dir org.melodymaestro.Game.yaml`
+- **Linux AppImage** — `builds/linux/MelodyMaestro-1.0.0-x86_64.AppImage` (27 MB, tested on Manjaro). Built by `build_appimage.sh` which exports via Godot headless then wraps binary in a shell script that suppresses the Godot 4.6.2 AT-SPI crash (`AT_SPI_BUS_ADDRESS=""`, `NO_AT_BRIDGE=1`, `GNOME_ACCESSIBILITY=0`, `unset DRI_PRIME`). Two harmless disconnect errors always appear in terminal — unfixable without patching the engine.
+- **Windows exe** — `builds/windows/MelodyMaestro.exe` (100 MB). Run directly, no install needed.
+- **GitHub release v1.0.0** — both assets published at github.com/samperk1/melody-maestro/releases
+- `org.melodymaestro.Game.yaml` Flatpak manifest exists but is untested
 
 ---
 
 ## Still To Do
 
-1. **Flatpak finalisation** — test the built bundle end-to-end; verify MIDI and mic permissions in the sandbox
-2. **Sound quality** — the procedural piano tone is functional but thin; consider adding a sampled piano soundfont (SF2) via GDNative or baking short WAV samples into the project
-3. **More songs** — expand the library with more pop, jazz, blues, and classical; add difficulty metadata so songs can be sorted/filtered
-4. **Settings screen** — volume slider, key remapping UI, toggle for menu music
-5. **Monster polish** — more distinct monster types per difficulty tier; death animation variety
-6. **Maestro dialogue** — expand the Maestro character speech beyond "welcome" / "missed" / "good_job"
-7. **Accessibility** — colour-blind friendly note colours; larger UI scaling option
-8. **High score names** — allow players to enter initials on a game-over screen rather than using the name from the start screen
-9. **Mobile / gamepad** — touch input and controller support for non-keyboard players
+### Android Port (planned, in order)
+
+Full plan agreed. Build needs Android SDK + a capable machine — may need the big desktop PC for the APK build step.
+
+**Phase 1 — Export setup** (one-time, ~2–3 hours)
+- Download Godot 4 Android export templates (Editor → Manage Export Templates)
+- Install Android Studio / SDK, point Godot Editor Settings to SDK path
+- Generate signing keystore: `keytool -genkey -v -keystore melody-maestro.keystore -alias melody-maestro -keyalg RSA -keysize 2048 -validity 10000`
+- Add Android preset in Godot: package `com.samperk1.melodymaestro`, link keystore, add RECORD_AUDIO permission
+- Export `.apk` for sideload testing (free — no Play Store account needed)
+
+**Phase 2 — Input modes on Android** (~3–4 hours)
+- On Android, show only 3 input options: **MIDI Keyboard**, **Touch Keyboard**, **Tap Balloons**
+- Remove Computer Keyboard and Microphone from the option list on mobile (`OS.get_name() in ["Android", "iOS"]`)
+- Hide the keyboard-size dropdown on mobile (irrelevant for touch/tap modes)
+- **Touch keyboard:** make keys bigger (~65 px wide vs 25 px), show only 13 notes (1 octave) centred on song's range; add `InputEventScreenTouch` alongside `InputEventMouseButton` in `piano_keyboard.gd _on_key_input()`; turn off "Emulate Mouse From Touch" in Project Settings when touch keyboard is selected
+- **Tap balloon mode:** in `balloon.gd _input()`, detect `InputEventScreenTouch` on the balloon's area and emit `InputHandler.note_on(target_note)` — existing scoring/strike logic unchanged
+
+**Phase 3 — Mobile game mechanic** (~2–3 hours)
+- No chords on mobile: level 30+ procedural generator returns single notes only when on Android/iOS
+- Speed escalates instead of chord complexity: add `(current_level - 30) * 10.0` extra px/s beyond level 30
+- In tap mode: spawner waits until `active_balloons.size() == 0` before spawning next — true one-at-a-time
+- Empty-space taps do not count as strikes in tap mode (accidental touches); tapping the wrong balloon still does
+
+**Phase 4 — Layout & UI** (~2–3 hours)
+- Lock orientation to landscape in Android export preset
+- Bump button minimum size to 80 px tall for finger comfort
+- Increase leaderboard/score font size on mobile
+
+**Phase 5 — Device testing** (variable)
+- Sideload APK via `adb install` or copy to phone
+- Test: MIDI via USB-C OTG, touch keyboard multi-touch, tap mode strike logic, pause, exit→welcome, leaderboard save
+
+**Phase 6 — Google Play Store** (1 day + 3–7 day review, $25 one-time)
+- Signed `.aab` from Godot
+- Store listing: name, description, screenshots (phone + tablet), icon (512×512)
+- Privacy policy page (GitHub Pages sufficient — state no data leaves device)
+- Submit to Internal Testing first, then promote to Production
+
+### Other TODOs
+1. **Sound quality** — procedural piano tone is thin; consider SF2 soundfont or baked WAVs
+2. **Settings screen** — volume slider, key remapping, menu music toggle
+3. **More songs** — expand library; add difficulty metadata
+4. **Monster polish** — more distinct types per tier, more death animations
+5. **Maestro dialogue** — expand beyond "welcome" / "missed" / "good_job"
+6. **Accessibility** — colour-blind note colours, UI scaling option
+7. **High score name entry** — let player enter name on game-over screen
+8. **Flatpak** — `org.melodymaestro.Game.yaml` exists but untested end-to-end
 
 ---
 
@@ -98,7 +140,14 @@ Scene flow: `welcome_screen.tscn` → `main_game.tscn` (reloaded on restart or l
 
 ## Changelog
 
-### Latest
+### v1.0.0 (released 2026-04-18)
+- Linux AppImage working end-to-end on Manjaro; published to GitHub releases
+- Windows exe published alongside AppImage
+- Fixed Godot 4.6.2 AT-SPI idle-loop freeze: eliminated all scene transitions, replaced with CanvasLayer overlay pattern; hide() instead of queue_free() throughout
+- AT-SPI per-frame slot error suppressed via env vars in AppRun + binary wrapper
+- Git attribution updated: Sam Perkins (samperk1@hotmail.com)
+
+### Earlier
 - Added **pause system** (Escape key + Pause button); pause overlay with Resume and Quit to Menu
 - **Top-3 leaderboard** replacing single high score; auto-migrates old save format
 - **Start screen background music** — 32-note jazz melody loops quietly (-22 dB)
