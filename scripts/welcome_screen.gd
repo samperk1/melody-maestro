@@ -1,12 +1,13 @@
 extends Control
 
+signal game_start
+
 @onready var player_name_input = $VBoxContainer/PlayerNameInput
 @onready var input_type_option = $VBoxContainer/InputTypeOption
 @onready var keys_option = $VBoxContainer/KeysOption
 @onready var start_button = $VBoxContainer/StartButton
 @onready var high_score_label = $VBoxContainer/HighScoreLabel
 
-# Gentle jazz-style melody that loops on the menu screen
 const MENU_MELODY = [
 	60, 64, 67, 64, 69, 67, 64, 62,
 	60, 65, 69, 65, 71, 69, 65, 62,
@@ -56,16 +57,11 @@ func _update_high_score_display():
 	high_score_label.text = "\n".join(lines)
 
 func _on_start_button_pressed():
-	print("Start button pressed! Switching to main game...")
 	var player_name = player_name_input.text
 	if player_name.strip_edges() == "":
 		player_name = "Maestro"
-		
-	var input_type = input_type_option.get_item_text(input_type_option.selected)
-	var keys_count = keys_option.get_item_text(keys_option.selected).to_int()
-	
 	GameManager.player_name = player_name
-	GameManager.input_type = input_type
-	GameManager.keys_count = keys_count
-	
-	get_tree().change_scene_to_file("res://scenes/main_game.tscn")
+	GameManager.input_type = input_type_option.get_item_text(input_type_option.selected)
+	GameManager.keys_count = keys_option.get_item_text(keys_option.selected).to_int()
+	_note_timer.stop()
+	game_start.emit()

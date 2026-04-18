@@ -82,21 +82,34 @@ White keys: A   S   D   F   G   H   J   K   L   ;
 
 ---
 
-## Building & Running
+## Download & Run
 
-### Run in Godot Editor
-1. Open the project folder in **Godot 4.x**
-2. Press **F5** or click the Play button
-
-### Build a Flatpak (Linux)
+### Linux (AppImage)
+Download `MelodyMaestro-1.0.0-x86_64.AppImage` from the [Releases](../../releases) page, make it executable, and run:
 ```bash
-flatpak-builder --force-clean build-dir org.melodymaestro.Game.yaml
+chmod +x MelodyMaestro-1.0.0-x86_64.AppImage
+./MelodyMaestro-1.0.0-x86_64.AppImage
 ```
+No installation required. Tested on Manjaro and Debian-based distros.
+
+### Windows
+Download `MelodyMaestro.exe` from the [Releases](../../releases) page and run it directly.
+
+### Run from Source (Godot Editor)
+1. Install **Godot 4.6**
+2. Open the project folder
+3. Press **F5** or click the Play button
+
+### Build the Linux AppImage yourself
+```bash
+chmod +x build_appimage.sh
+./build_appimage.sh
+```
+Requires Godot 4.6 installed. The script exports the project, builds the AppDir, and packages the AppImage automatically.
 
 ### Requirements
-- Godot 4.x
 - For MIDI: any class-compliant USB MIDI device
-- For Microphone input: a working audio input device and a `Record` audio bus with a Spectrum Analyzer effect configured in the Godot project settings
+- For Microphone input: a working audio input and a `Record` audio bus with a Spectrum Analyzer effect in Godot's Audio settings
 
 ---
 

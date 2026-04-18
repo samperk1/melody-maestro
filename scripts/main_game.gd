@@ -19,6 +19,7 @@ extends Node2D
 @onready var lives_label = $CanvasLayer/LivesLabel
 @onready var background = $Background
 
+var _game_started: bool = false
 var active_balloons = []
 var current_song_data = {}
 var song_index = 0
@@ -33,33 +34,45 @@ var _bg_base_color: Color = Color(0.15, 0.2, 0.3)
 var _bg_time: float = 0.0
 
 func _ready():
-	print("Main game scene loaded!")
-	InputHandler.use_midi = (GameManager.input_type == "MIDI Keyboard")
-	InputHandler.use_computer_keyboard = (GameManager.input_type == "Computer Keyboard")
-	keyboard.setup_keyboard(GameManager.keys_count)
-	
-	if not InputHandler.note_on.is_connected(_on_note_on):
-		InputHandler.note_on.connect(_on_note_on)
-	if not InputHandler.note_off.is_connected(_on_note_off):
-		InputHandler.note_off.connect(_on_note_off)
-	
 	spawner_timer.timeout.connect(_spawn_next_balloon)
-	
 	restart_button.pressed.connect(_on_restart_pressed)
 	exit_button.pressed.connect(_on_exit_pressed)
 	pause_button.pressed.connect(_toggle_pause)
 	resume_button.pressed.connect(_toggle_pause)
 	pause_quit_button.pressed.connect(_on_exit_pressed)
-	continue_button.pressed.connect(_on_continue_pressed)
-
+	if not continue_button.pressed.is_connected(_on_continue_pressed):
+		continue_button.pressed.connect(_on_continue_pressed)
 	level_clear_panel.visible = false
 	pause_panel.visible = false
 
-	# Add sky layer (clouds, birds, storm effects) behind everything
 	var sky = Node2D.new()
 	sky.set_script(load("res://scripts/sky_manager.gd"))
 	add_child(sky)
 
+	_show_welcome_overlay()
+
+func _show_welcome_overlay():
+	_game_started = false
+	var layer = CanvasLayer.new()
+	layer.layer = 100
+	layer.name = "WelcomeLayer"
+	var welcome = load("res://scenes/welcome_screen.tscn").instantiate()
+	layer.add_child(welcome)
+	add_child(layer)
+	welcome.game_start.connect(_on_welcome_complete)
+
+func _on_welcome_complete():
+	var layer = get_node_or_null("WelcomeLayer")
+	if layer:
+		layer.hide()
+	_game_started = true
+	InputHandler.use_midi = (GameManager.input_type == "MIDI Keyboard")
+	InputHandler.use_computer_keyboard = (GameManager.input_type == "Computer Keyboard")
+	keyboard.setup_keyboard(GameManager.keys_count)
+	if not InputHandler.note_on.is_connected(_on_note_on):
+		InputHandler.note_on.connect(_on_note_on)
+	if not InputHandler.note_off.is_connected(_on_note_off):
+		InputHandler.note_off.connect(_on_note_off)
 	_start_level()
 
 func _process(delta):
@@ -84,14 +97,12 @@ func _start_level():
 	
 	await get_tree().create_timer(1.0).timeout
 	maestro.say("welcome")
-	
 	if current_song_data["notes"].size() > 0:
 		var initial_note = current_song_data["notes"][0]
 		if initial_note is Array:
 			music_staff.set_note(initial_note[0])
 		else:
 			music_staff.set_note(initial_note)
-	
 	spawner_timer.start(1.5)
 
 func _update_atmosphere():
@@ -116,7 +127,7 @@ func _animate_background(delta: float):
 
 
 func _unhandled_input(event: InputEvent):
-	if event.is_action_pressed("ui_cancel"):
+	if _game_started and event.is_action_pressed("ui_cancel"):
 		_toggle_pause()
 
 func _toggle_pause():
@@ -127,13 +138,32 @@ func _toggle_pause():
 
 func _on_restart_pressed():
 	lives = 3
+	strikes = 0
+	GameManager.reset_game()
 	GameManager.save_game()
-	get_tree().reload_current_scene()
+	if continue_button.pressed.is_connected(_on_restart_pressed):
+		continue_button.pressed.disconnect(_on_restart_pressed)
+	if not continue_button.pressed.is_connected(_on_continue_pressed):
+		continue_button.pressed.connect(_on_continue_pressed)
+	level_clear_panel.visible = false
+	_start_level()
 
 func _on_exit_pressed():
 	get_tree().paused = false
 	GameManager.save_game()
-	get_tree().change_scene_to_file("res://scenes/welcome_screen.tscn")
+	GameManager.reset_game()
+	spawner_timer.stop()
+	for b in active_balloons:
+		if is_instance_valid(b): b.queue_free()
+	active_balloons.clear()
+	var existing = get_node_or_null("WelcomeLayer")
+	if existing:
+		existing.show()
+		var ws = existing.get_child(0)
+		if ws and ws.has_method("_update_high_score_display"):
+			ws._update_high_score_display()
+	else:
+		_show_welcome_overlay()
 
 func _on_continue_pressed():
 	level_clear_panel.visible = false

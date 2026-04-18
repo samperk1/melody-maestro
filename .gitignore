@@ -3,7 +3,8 @@
 *.translation
 *.tmp
 *.log
-*.import/
+*.import
+Screenshot_*.png
 *.mono/
 *.csproj
 *.sln
@@ -12,3 +13,5 @@ bin/
 build/
 builds/
 *.uid
+AppDir/
+appimagetool-*.AppImage

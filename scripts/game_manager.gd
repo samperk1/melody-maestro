@@ -172,6 +172,22 @@ var songs = [
 func _ready():
 	load_game()
 
+func goto_game(from: Node):
+	print("GOTO_GAME called")
+	from.hide()
+	var new_scene = load("res://scenes/main_game.tscn").instantiate()
+	get_tree().root.add_child(new_scene)
+	get_tree().current_scene = new_scene
+	from.queue_free()
+
+func goto_menu(from: Node):
+	get_tree().paused = false
+	from.hide()
+	var new_scene = load("res://scenes/welcome_screen.tscn").instantiate()
+	get_tree().root.add_child(new_scene)
+	get_tree().current_scene = new_scene
+	from.queue_free()
+
 func reset_game():
 	score = 0
 	current_level_index = 0

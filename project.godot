@@ -15,9 +15,8 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="Melody Maestro"
-run/main_scene="res://scenes/welcome_screen.tscn"
+run/main_scene="res://scenes/main_game.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
-config/icon="res://icon.svg"
 
 [autoload]
 
@@ -30,6 +29,7 @@ SoundManager="*res://scripts/sound_manager.gd"
 window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
+accessibility/update_mode=0
 
 [rendering]
 
