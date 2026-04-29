@@ -7,9 +7,7 @@ const LINE_SPACING = 20.0
 const START_Y = 60.0
 const BOTTOM_LINE_Y = 140.0  # E4 sits on the bottom (5th) staff line
 const STEP_PX = 10.0         # pixels per diatonic step (half a line gap)
-# Maps chromatic pitch class → diatonic step within octave (C=0 … B=6)
 const CHROMA_TO_DIATONIC = {0:0, 1:0, 2:1, 3:1, 4:2, 5:3, 6:3, 7:4, 8:4, 9:5, 10:5, 11:6}
-# E4 = MIDI 64: pitch class 4 → diatonic 2, octave-group = 64/12 = 5 → 2 + 5*7 = 37
 const E4_DIATONIC = 37
 const NOTE_NAMES = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
 
@@ -17,6 +15,7 @@ var _current_midi: int = 60
 var _note_label: Label
 
 func _ready():
+	note_head.visible = false  # ● glyph missing from default font; drawn manually below
 	_note_label = Label.new()
 	_note_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_note_label.add_theme_font_size_override("font_size", 16)
@@ -32,16 +31,8 @@ func _midi_center_y(midi_note: int) -> float:
 
 func set_note(midi_note: int):
 	_current_midi = midi_note
-	var center_y = _midi_center_y(midi_note)
-	# position.y sets the top-left of NoteHead; NoteHead is 40 px tall so subtract 20 for center
-	note_head.position.y = center_y - 20.0
-
-	var is_sharp = (midi_note % 12) in [1, 3, 6, 8, 10]
-	note_head.modulate = Color.GOLD if is_sharp else Color.WHITE
-
-	var octave = (midi_note / 12) - 1  # MIDI standard: C4=60 → octave 4
+	var octave = (midi_note / 12) - 1
 	_note_label.text = NOTE_NAMES[midi_note % 12] + str(octave)
-
 	queue_redraw()
 
 func _draw():
@@ -53,17 +44,35 @@ func _draw():
 		var y = START_Y + i * LINE_SPACING
 		draw_line(Vector2(0, y), Vector2(size.x, y), line_color, line_width)
 
-	# Ledger lines for notes outside the staff (e.g. middle C below, high notes above)
 	var center_y = _midi_center_y(_current_midi)
-	var ledger_x0 = size.x * 0.35
-	var ledger_x1 = size.x * 0.65
-	# Below the staff: draw a ledger line for each staff-line position below bottom line
+	var head_x = size.x / 2.0
+	var head_r = 8.0
+	var ledger_x0 = head_x - head_r - 6.0
+	var ledger_x1 = head_x + head_r + 6.0
+
+	# Ledger lines below the staff (e.g. middle C)
 	var y = BOTTOM_LINE_Y + LINE_SPACING
 	while center_y >= y - STEP_PX:
 		draw_line(Vector2(ledger_x0, y), Vector2(ledger_x1, y), line_color, line_width)
 		y += LINE_SPACING
-	# Above the staff: draw ledger lines above the top line
+	# Ledger lines above the staff
 	y = START_Y - LINE_SPACING
 	while center_y <= y + STEP_PX:
 		draw_line(Vector2(ledger_x0, y), Vector2(ledger_x1, y), line_color, line_width)
 		y -= LINE_SPACING
+
+	# Note head — filled circle
+	var is_sharp = (_current_midi % 12) in [1, 3, 6, 8, 10]
+	var note_color = Color.GOLD if is_sharp else Color.WHITE
+	draw_circle(Vector2(head_x, center_y), head_r, note_color)
+
+	# Stem — goes up when note is on/below middle line (B4), down when above
+	var stem_len = 32.0
+	if center_y >= 100.0:
+		draw_line(Vector2(head_x + head_r - 1.0, center_y),
+				  Vector2(head_x + head_r - 1.0, center_y - stem_len),
+				  note_color, 2.0)
+	else:
+		draw_line(Vector2(head_x - head_r + 1.0, center_y),
+				  Vector2(head_x - head_r + 1.0, center_y + stem_len),
+				  note_color, 2.0)
