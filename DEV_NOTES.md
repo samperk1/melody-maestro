@@ -73,7 +73,7 @@ Scene flow: `main_game.tscn` is the permanent main scene — it never changes. T
 - **Windows exe** — `builds/windows/MelodyMaestro.exe` (100 MB). Run directly, no install needed.
 - **GitHub release v1.0.0** — both assets published at github.com/samperk1/melody-maestro/releases
 - `org.melodymaestro.Game.yaml` Flatpak manifest exists but is untested
-- **Web / GitHub Pages** — `docs/coi-serviceworker.js` is ready; export the game from Godot to `docs/index.html`, add `<script src="coi-serviceworker.js"></script>` to that file, then enable GitHub Pages from the `docs/` folder. Full guide: [`DEPLOY.md`](DEPLOY.md)
+- **Web / GitHub Pages** — live at https://samperk1.github.io/melody-maestro/ (served from `docs/`). Re-export from Godot → Web to `docs/index.html`, then re-run the `sed` command from `DEPLOY.md` to re-inject the service worker line before pushing. Note: `Melody Maestro.html` (raw Godot export) and `docs/*.import` files are harmless but can be deleted from `docs/` after each export to keep the folder tidy.
 
 ---
 
@@ -83,6 +83,8 @@ Scene flow: `main_game.tscn` is the permanent main scene — it never changes. T
 |---|---|---|
 | Staff note mismatch — wrong timing | `main_game.gd` | Staff now updates to the current spawning note at the start of `_spawn_next_balloon()`, not the next note after spawning |
 | Staff note mismatch — wrong position | `music_staff.gd` | Replaced chromatic half-step formula with correct diatonic treble-clef mapping anchored to E4 on the bottom staff line; added ledger lines and note name label |
+| Missing glyph — note head box | `main_game.tscn`, `music_staff.gd` | `●` (U+25CF) not in Godot's embedded web font; cleared `text=""` in the scene and hid the Label node; note head is now drawn as a filled circle + stem in `_draw()` |
+| Missing glyph — projectile box | `note_projectile.gd` | `♫` (U+266B) had the same missing-font issue; removed the Label entirely and draw an eighth-note shape (circle head, stem, flag) in `_draw()` instead |
 
 ---
 

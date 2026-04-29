@@ -97,11 +97,11 @@ Download `MelodyMaestro.exe` from the [Releases](../../releases) page and run it
 
 ### Web (GitHub Pages)
 
-> Coming soon at **https://samperk1.github.io/melody-maestro/**
->
-> Works in Chrome, Edge, and Firefox — no install needed. MIDI keyboard support in Chrome/Edge only.
+Play in your browser at **https://samperk1.github.io/melody-maestro/**
 
-See [`DEPLOY.md`](DEPLOY.md) for the full step-by-step export and publish guide.
+No install needed — works on desktop and mobile. MIDI keyboard support in Chrome and Edge only; use the on-screen keyboard or microphone on other browsers.
+
+See [`DEPLOY.md`](DEPLOY.md) for the full step-by-step export and publish guide (needed each time you update the game).
 
 ### Run from Source (Godot Editor)
 1. Install **Godot 4.6**

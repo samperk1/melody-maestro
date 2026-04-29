@@ -118,8 +118,18 @@ will need to use the on-screen keyboard or microphone input instead.
 Every time you change the game and want to update the live version:
 
 1. Export again from Godot (**Project → Export → Web → Export Project**) to `docs/index.html`.
-2. Re-add the `<script src="coi-serviceworker.js"></script>` line to `docs/index.html`.
-3. `git add docs/ && git commit -m "Update web build" && git push origin main`
+2. Clean up the extra files Godot leaves in `docs/`:
+   ```bash
+   rm -f "docs/Melody Maestro.html" docs/*.import
+   ```
+3. Re-add the service worker line:
+   ```bash
+   sed -i 's|<head>|<head>\n\t<script src="coi-serviceworker.js"></script>|' docs/index.html
+   ```
+4. Push:
+   ```bash
+   git add docs/ && git commit -m "Update web build" && git push origin main
+   ```
 
 ---
 
