@@ -42,7 +42,7 @@ White keys: A   S   D   F   G   H   J   K   L   ;
 ### Visuals & Audio
 - Animated tuxedo pianist on the start screen with top hat, bow tie, and playing hands
 - Quiet background melody plays on the start screen
-- Musical staff displays the upcoming note
+- Musical staff displays the current note on a correctly-mapped treble-clef staff with note name label
 - Note projectiles fly from keys to pop targets
 - Monsters grow more menacing at higher levels (glowing eyes, jitter, size scaling)
 - Atmospheric background colour shifts from calm blue-grey to deep crimson as levels progress
@@ -56,12 +56,12 @@ White keys: A   S   D   F   G   H   J   K   L   ;
 1. On the start screen enter your name, choose your input method, and select your keyboard size (25 / 49 / 61 / 88 keys)
 2. Hit **START GAME**
 3. Notes appear on screen — press the matching key before they reach the bottom
-4. The musical staff at the top always shows the next note coming
+4. The musical staff shows the note currently falling — match it to the balloon's label
 5. Build a streak to unlock groove backing tracks
 6. Clear all notes in a song to advance to the next level
 
 ### Tips
-- Watch the musical staff — it shows what's coming a beat early
+- Watch the musical staff — it shows the note name and its position on the treble clef so you can learn to read music as you play
 - Balloons have the note name printed on them; monsters also show the note in a high-contrast badge
 - Pause with **Escape** if you need a breather
 - Wrong notes cost strikes — 3 strikes lose a life, so play carefully on higher levels
@@ -94,6 +94,14 @@ No installation required. Tested on Manjaro and Debian-based distros.
 
 ### Windows
 Download `MelodyMaestro.exe` from the [Releases](../../releases) page and run it directly.
+
+### Web (GitHub Pages)
+
+> Coming soon at **https://samperk1.github.io/melody-maestro/**
+>
+> Works in Chrome, Edge, and Firefox — no install needed. MIDI keyboard support in Chrome/Edge only.
+
+See [`DEPLOY.md`](DEPLOY.md) for the full step-by-step export and publish guide.
 
 ### Run from Source (Godot Editor)
 1. Install **Godot 4.6**

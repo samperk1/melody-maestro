@@ -230,16 +230,22 @@ func _spawn_next_balloon():
 	if song_index >= current_song_data["notes"].size():
 		spawner_timer.stop()
 		return
-		
+
 	var notes = current_song_data["notes"][song_index]
 	var current_level = GameManager.current_level_index
-	
+
+	# Show the note that is about to fall on the staff
+	if notes is Array:
+		music_staff.set_note(notes[0])
+	else:
+		music_staff.set_note(notes)
+
 	# Monster probability logic: Increases by level
 	var monster_prob = clamp(float(current_level) * 0.05, 0.0, 1.0)
-	
+
 	# Tempo scaling
 	var current_speed = 90.0 + (current_level * 5.0)
-	
+
 	if notes is Array:
 		for note in notes:
 			var roll_monster = randf() < monster_prob
@@ -247,14 +253,8 @@ func _spawn_next_balloon():
 	else:
 		var roll_monster = randf() < monster_prob
 		_create_balloon(notes, current_speed, roll_monster)
-	
+
 	song_index += 1
-	if song_index < current_song_data["notes"].size():
-		var next_notes = current_song_data["notes"][song_index]
-		if next_notes is Array:
-			music_staff.set_note(next_notes[0])
-		else:
-			music_staff.set_note(next_notes)
 
 func _create_balloon(note: int, speed: float, is_monster: bool):
 	var x_pos = keyboard.get_key_x(note)

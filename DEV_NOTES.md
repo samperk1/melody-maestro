@@ -73,6 +73,16 @@ Scene flow: `main_game.tscn` is the permanent main scene — it never changes. T
 - **Windows exe** — `builds/windows/MelodyMaestro.exe` (100 MB). Run directly, no install needed.
 - **GitHub release v1.0.0** — both assets published at github.com/samperk1/melody-maestro/releases
 - `org.melodymaestro.Game.yaml` Flatpak manifest exists but is untested
+- **Web / GitHub Pages** — `docs/coi-serviceworker.js` is ready; export the game from Godot to `docs/index.html`, add `<script src="coi-serviceworker.js"></script>` to that file, then enable GitHub Pages from the `docs/` folder. Full guide: [`DEPLOY.md`](DEPLOY.md)
+
+---
+
+## Bug Fixes Applied
+
+| Fix | Files | Detail |
+|---|---|---|
+| Staff note mismatch — wrong timing | `main_game.gd` | Staff now updates to the current spawning note at the start of `_spawn_next_balloon()`, not the next note after spawning |
+| Staff note mismatch — wrong position | `music_staff.gd` | Replaced chromatic half-step formula with correct diatonic treble-clef mapping anchored to E4 on the bottom staff line; added ledger lines and note name label |
 
 ---
 
