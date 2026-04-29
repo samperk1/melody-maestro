@@ -15,7 +15,8 @@ var _current_midi: int = 60
 var _note_label: Label
 
 func _ready():
-	note_head.visible = false  # ● glyph missing from default font; drawn manually below
+	note_head.visible = false  # drawn manually in _draw(); clearing text too as a fallback
+	note_head.text = ""
 	_note_label = Label.new()
 	_note_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_note_label.add_theme_font_size_override("font_size", 16)
