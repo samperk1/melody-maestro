@@ -85,6 +85,7 @@ Scene flow: `main_game.tscn` is the permanent main scene — it never changes. T
 | Staff note mismatch — wrong position | `music_staff.gd` | Replaced chromatic half-step formula with correct diatonic treble-clef mapping anchored to E4 on the bottom staff line; added ledger lines and note name label |
 | Missing glyph — note head box | `main_game.tscn`, `music_staff.gd` | `●` (U+25CF) not in Godot's embedded web font; cleared `text=""` in the scene and hid the Label node; note head is now drawn as a filled circle + stem in `_draw()` |
 | Missing glyph — projectile box | `note_projectile.gd` | `♫` (U+266B) had the same missing-font issue; removed the Label entirely and draw an eighth-note shape (circle head, stem, flag) in `_draw()` instead |
+| **TODO: Missing glyph — black key labels** | `piano_keyboard.gd` | Line 28 replaces `#` with `♯` (U+266F) which is not in the embedded web font, causing black keys to show a box with the code. Fix: remove the `.replace("#", "♯")` call and keep plain ASCII `#` — e.g. `C#`, `D#` |
 
 ---
 
